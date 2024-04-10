@@ -1,0 +1,292 @@
+#include<iostream>
+#include<cstring>
+using namespace std;
+
+struct Patuvanje{
+char destinacija[100];
+float cena;
+bool daliLet;
+int denovi;
+};
+
+struct Agencija{
+char ime[100];
+char lokacija[100];
+Patuvanje patuvanja[100];
+int n;
+void print()
+{
+    cout<<ime<<" "<<lokacija<<endl;
+    for(int i=0;i<n;i++)
+    {
+        cout<<patuvanja[i].destinacija<<" "
+        <<patuvanja[i].denovi<<" "<<patuvanja[i].cena<<endl;
+    }
+}
+};
+
+void najeftina_ponuda(Agencija agencii[], int n, bool daliLet)
+{
+    int najniskaCena = 9999999;
+    int najniskaCenaI = 0;
+    for(int i=0;i<n;i++)
+    {
+        int vkupnaCena = 0;
+        for(int j=0;j<agencii[i].n;j++)
+        {
+
+            if(agencii[i].patuvanja[j].daliLet == daliLet)
+            {
+                if(agencii[i].patuvanja[j].cena<=najniskaCena)
+                {
+                    najniskaCena = agencii[i].patuvanja[j].cena;
+                    najniskaCenaI = i;
+                }
+            }
+        }
+    }
+
+    cout<<"Najeftina ponuda ima agencijata: "<<endl;
+    cout<<agencii[najniskaCenaI].ime<<" "<<agencii[najniskaCenaI].lokacija<<endl;
+    cout<<"Najniskata cena iznesuva: "<<najniskaCena;
+}
+
+
+
+
+int main()
+{
+    Agencija agencii[100];
+    int n;
+    int i;
+    bool daliLet;
+    cin>>n;
+    for(i=0;i<n;i++)
+    {
+        cin>>agencii[i].ime;
+        cin>>agencii[i].lokacija;
+        cin>>agencii[i].n;
+        for(int j=0;j<agencii[i].n;j++)
+        {
+            cin>>agencii[i].patuvanja[j].destinacija;
+            cin>>agencii[i].patuvanja[j].cena;
+            cin>>agencii[i].patuvanja[j].daliLet;
+            cin>>agencii[i].patuvanja[j].denovi;
+        }
+    }
+    cin>>daliLet;
+    for(int i=0;i<n;i++)
+    {
+        agencii[i].print();
+    }
+
+    najeftina_ponuda(agencii,n,daliLet);
+
+}
+
+
+
+
+
+
+VTORA
+
+
+#include<iostream>
+#include<cstring>
+using namespace std;
+
+class Order{
+private:
+    char ime[50];
+    double cena;
+    int kolicina;
+public:
+    Order(char * ime ="", double cena =0, int kolicina = 0)
+    {
+        this->cena = cena;
+        this->kolicina = kolicina;
+        strcpy(this->ime,ime);
+    }
+    double price()
+    {
+        double p = cena * kolicina;
+        if(p>15000)
+        {
+            return p*0.85;
+        }
+        return p;
+    }
+    void print()
+    {
+        cout<<ime<<" "<<kolicina<<" x "<<cena<<endl;
+        cout<<"Price: "<<cena*kolicina<<endl;
+        cout<<"Total Price: "<<price()<<endl;
+    }
+};
+
+
+class Invoice{
+private:
+    long brFaktura;
+    Order * naracki;
+    int n;
+public:
+    Invoice(long brFaktura)
+    {
+        this->brFaktura = brFaktura;
+        naracki = NULL;
+        n = 0;
+    }
+    ~Invoice(){
+    delete [] naracki;
+    }
+    Invoice(const Invoice &in)
+    {
+        brFaktura = in.brFaktura;
+        n = in.n;
+        naracki = new Order[n];
+        for(int i=0;i<n;i++)
+        {
+            naracki[i] = in.naracki[i];
+        }
+    }
+    Invoice& operator=(const Invoice &in)
+    {
+        if(this!=&in){
+            brFaktura = in.brFaktura;
+            n = in.n;
+            delete [] naracki;
+            naracki = new Order[n];
+            for(int i=0;i<n;i++)
+            {
+                naracki[i] = in.naracki[i];
+            } 
+        }
+        return *this;
+    }
+    
+    void newOrder(Order &nov)
+    {
+        Order * temp = new Order[n+1];
+        for(int i=0;i<n;i++)
+        {
+            temp[i] = naracki[i];
+        }
+        temp[n++] = nov;
+        delete [] naracki;
+        naracki = temp;
+    }
+    
+    double calculate()
+    {
+        double vkupno =0;
+        for(int i=0;i<n;i++)
+        {
+            vkupno+=naracki[i].price();
+        }
+        return vkupno;
+    }
+    double calculateDDV()
+    {
+        return calculate()*1.18;
+    }
+    void print(){
+        cout<<"Invoice Number: "<<brFaktura<<endl;
+        for(int i=0;i<n;i++)
+        {
+            cout<<i+1<<". ";
+            naracki[i].print();
+        }
+        cout<<"Price: "<<calculate()<<endl;
+        cout<<"Tax: "<<calculate()*0.18<<endl;
+        cout<<"Total Price:"<<calculateDDV()<<endl;
+    }
+
+};
+
+
+int main() {
+        // se testira zadacata modularno
+    int testCase;
+    cin >> testCase;
+
+        int n, kolicina;
+        double cena;
+        char ime[100];
+
+        if(testCase == 1) {
+        cout << "===== Testiranje na klasata Order ======" << endl;
+        cin.get();
+        cin >> ime;
+        cin >> cena;
+        cin >> kolicina;
+        Order o(ime, cena, kolicina);
+                cout << "Order constructor OK" << endl;
+    } else if(testCase == 2) {
+        cout << "===== Testiranje na klasata Order so dopolnitelni metodi ======" << endl;
+        cin.get();
+        cin >> ime;
+        cin >> cena;
+        cin >> kolicina;
+        Order o(ime, cena, kolicina);
+                o.print();
+        
+    }else if(testCase == 3){
+        cout << "===== Testiranje na klasata Invoice so metodot print() ======" << endl;
+                Invoice in(123456789);
+        in.print();
+        }
+    else if(testCase == 4) {
+        cout << "===== Testiranje na klasata Invoice so metodot newOrder() i dopolnitelni metodi ======" << endl;
+                Invoice in(123456789);
+                cin>>n;
+                        for (int i=0;i<n;i++){
+                                cin.get();
+                        cin >> ime;
+                        cin >> cena;
+                        cin >> kolicina;
+                        Order o(ime, cena, kolicina);
+                                in.newOrder(o);
+                        }
+        in.print();
+    }
+    else if(testCase == 5) {
+        cout << "===== Testiranje kompletna funkcionalnost ======" << endl;
+                Invoice in(123456789);
+                cin>>n;
+                        for (int i=0;i<n;i++){
+                                cin.get();
+                        cin >> ime;
+                        cin >> cena;
+                        cin >> kolicina;
+                        Order o(ime, cena, kolicina);
+                                in.newOrder(o);
+                        }
+        Invoice in_new=in;
+        in.print();
+        in_new.print();
+        
+        cin.get();
+        cin >> ime;
+        cin >> cena;
+        cin >> kolicina;
+        Order o(ime, cena, kolicina);
+                in.newOrder(o);
+            
+        in.print();
+        in_new.print();
+    }
+return 0;
+}
+
+
+
+3
+5
+1 2 3 4 5   
+3
+1 2 3     
+6
+1 4 5 6 7 10 
+
